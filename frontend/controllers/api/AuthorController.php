@@ -31,7 +31,7 @@ class AuthorController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['only'] = ['update', 'delete', 'logout'];
+        $behaviors['authenticator']['only'] = ['update', 'delete', 'logout', 'me'];
         $behaviors['authenticator']['authMethods'] = [
             'class' => HttpBearerAuth::class,
         ];
@@ -41,7 +41,7 @@ class AuthorController extends ActiveController
     public function checkAccess($action, $model = null, $params = [])
     {
         if ($action === 'update' || $action === 'delete') {
-            if ($model->id !== \Yii::$app->user->id)
+            if ($model->id !== \Yii::$app->user->identity->id)
                 throw new ForbiddenHttpException('You can\'t delete or update another author information');
         }
     }
@@ -56,7 +56,7 @@ class AuthorController extends ActiveController
             return [
                 'isSuccess' => 201,
                 'message' => 'You have been successfully registered',
-                'author' => $model,
+                'data' => $model,
                 'your token' => $model->getAccessToken()
             ];
         };
@@ -69,6 +69,40 @@ class AuthorController extends ActiveController
 
 
     public function actionLogout()
+    {
+        $author = Author::findOne(Yii::$app->user->identity->id);
+
+        $author->access_token = null;
+        $author->save();
+
+        return [
+            'isSuccess' => 200,
+            'message' => 'You have been successfully logout. Your token is no longer valid',
+        ];
+    }
+
+    public function actionLogin()
+    {
+        $model = new LoginForm();
+
+        $model->attributes = $this->request->post();
+
+        if ($model->login()) {
+            return [
+                'isSuccess' => 201,
+                'message' => 'Welcome back!',
+                'data' => $model,
+                'your token' => $model->getAccessToken()
+            ];
+        }
+
+        return [
+            'hasErrors' => $model->hasErrors(),
+            'errors' => $model->getErrors(),
+        ];
+    }
+
+    public function actionMe()
     {
         return Yii::$app->user->identity;
     }

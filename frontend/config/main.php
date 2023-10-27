@@ -53,9 +53,11 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/author',
                     'extraPatterns' => [
+                        'GET me' => 'me',
+                        'POST register' => 'create',
+                        'POST login' => 'login',
                         'POST logout' => 'logout',
                     ],
-
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',

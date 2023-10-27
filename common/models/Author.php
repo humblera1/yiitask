@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use yii\web\IdentityInterface;
 use yii\web\Link;
@@ -23,7 +25,7 @@ use yii\web\Linkable;
  *
  * @property Book[] $books
  */
-class Author extends \yii\db\ActiveRecord implements IdentityInterface
+class Author extends ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -31,6 +33,15 @@ class Author extends \yii\db\ActiveRecord implements IdentityInterface
     public static function tableName()
     {
         return 'authors';
+    }
+
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => TimestampBehavior::class,
+            ],
+        ];
     }
 
     /**

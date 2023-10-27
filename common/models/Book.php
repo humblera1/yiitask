@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use common\models\enums\BookTypeEnum;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\helpers\Html;
 use yii2tech\ar\linkmany\LinkManyBehavior;
 
@@ -16,12 +18,16 @@ use yii2tech\ar\linkmany\LinkManyBehavior;
  * @property int|null $created_at
  * @property int|null $updated_at
  *
+ * @property string $genre
+ *
  * @property Authors $author
  * @property BooksGenres[] $booksGenres
  * @property Genres[] $genres
  */
 class Book extends \yii\db\ActiveRecord
 {
+
+    public $genre;
     /**
      * {@inheritdoc}
      */
@@ -38,6 +44,9 @@ class Book extends \yii\db\ActiveRecord
                 'relation' => 'genres',
                 'relationReferenceAttribute' => 'genreList',
             ],
+            'timestampBehavior' => [
+                'class' => TimestampBehavior::class,
+            ],
         ];
     }
 
@@ -51,7 +60,19 @@ class Book extends \yii\db\ActiveRecord
             [['author_id', 'created_at', 'updated_at'], 'integer'],
             [['title', 'type'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Author::class, 'targetAttribute' => ['author_id' => 'id']],
-//            [['type'], 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This email address has already been taken.'],
+            [
+                ['type'],
+                'in',
+                'range' => array_keys(BookTypeEnum::TYPE_LIST),
+                'message' => 'This is not a valid type (valid values are: ' . implode(', ',array_keys(BookTypeEnum::TYPE_LIST)) . ')'
+            ],
+            [['genre'], 'string'],
+            [
+                ['genre'],
+                'in',
+                'range' => Genre::find()->select('name')->column(),
+                'message' => 'This is not a valid genre, check \'genres\' for possible values',
+            ],
             [['genreList'], 'safe'],
         ];
     }
@@ -76,7 +97,15 @@ class Book extends \yii\db\ActiveRecord
         return [
             'id',
             'title',
-            'genres'
+            'author' => function(){
+                return $this->author->username;
+            },
+            'type' => function(){
+                return $this->type ? BookTypeEnum::TYPE_LIST[$this->type] : null;
+            },
+            'genres' => function(){
+                return implode(',', $this->getGenres()->select('name')->column());
+            },
         ];
     }
 
@@ -129,5 +158,24 @@ class Book extends \yii\db\ActiveRecord
 
         return ($links) ? implode('; ', $links) : '';
 
+    }
+
+    public function beforeSave($insert)
+    {
+        if (isset($this->genre)) {
+            $genre = Genre::findOne(['name' => $this->genre]);
+            $genreId = $genre->id;
+
+            if (!empty($bookGenre = BookGenre::findOne(['books_id' => $this->id, 'genres_id' => $genreId]))) {
+                $bookGenre->delete();
+            } else {
+                $bookGenre = new BookGenre();
+                $bookGenre->genres_id = $genreId;
+                $bookGenre->books_id = $this->id;
+
+                $bookGenre->save();
+            }
+        }
+        return parent::beforeSave($insert);
     }
 }

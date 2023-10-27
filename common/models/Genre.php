@@ -3,6 +3,10 @@
 namespace common\models;
 
 use Yii;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\db\ActiveRecord;
+use yii\web\Linkable;
 
 /**
  * This is the model class for table "genres".
@@ -10,10 +14,10 @@ use Yii;
  * @property int $id
  * @property string $name
  *
- * @property Books[] $books
+ * @property Book[] $books
  * @property BooksGenres[] $booksGenres
  */
-class Genre extends \yii\db\ActiveRecord
+class Genre extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -42,6 +46,22 @@ class Genre extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
+        ];
+    }
+
+    public function fields()
+    {
+        $books = new ArrayDataProvider([
+            'allModels' => $this->books,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);
+
+        return [
+            'id',
+            'name',
+            'books',
         ];
     }
 

@@ -58,11 +58,6 @@ class SignupForm extends Model
         return $author->save();
     }
 
-    public function createAccessToken()
-    {
-
-    }
-
     public function getAccessToken()
     {
         return $this->_token;

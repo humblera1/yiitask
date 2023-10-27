@@ -10,8 +10,8 @@ use Yii;
  * @property int $books_id
  * @property int $genres_id
  *
- * @property Books $books
- * @property Genres $genres
+ * @property Book $books
+ * @property Genre $genres
  */
 class BookGenre extends \yii\db\ActiveRecord
 {
@@ -32,8 +32,8 @@ class BookGenre extends \yii\db\ActiveRecord
             [['books_id', 'genres_id'], 'required'],
             [['books_id', 'genres_id'], 'integer'],
             [['books_id', 'genres_id'], 'unique', 'targetAttribute' => ['books_id', 'genres_id']],
-            [['books_id'], 'exist', 'skipOnError' => true, 'targetClass' => Books::class, 'targetAttribute' => ['books_id' => 'id']],
-            [['genres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Genres::class, 'targetAttribute' => ['genres_id' => 'id']],
+            [['books_id'], 'exist', 'skipOnError' => true, 'targetClass' => Book::class, 'targetAttribute' => ['books_id' => 'id']],
+            [['genres_id'], 'exist', 'skipOnError' => true, 'targetClass' => Genre::class, 'targetAttribute' => ['genres_id' => 'id']],
         ];
     }
 
@@ -55,7 +55,7 @@ class BookGenre extends \yii\db\ActiveRecord
      */
     public function getBooks()
     {
-        return $this->hasOne(Books::class, ['id' => 'books_id']);
+        return $this->hasOne(Book::class, ['id' => 'books_id']);
     }
 
     /**
@@ -65,7 +65,7 @@ class BookGenre extends \yii\db\ActiveRecord
      */
     public function getGenres()
     {
-        return $this->hasOne(Genres::class, ['id' => 'genres_id']);
+        return $this->hasOne(Genre::class, ['id' => 'genres_id']);
     }
 
     /**

@@ -15,6 +15,7 @@ class LoginForm extends Model
     public $password;
 
     private $_author;
+    private $_token;
 
 
     /**
@@ -41,10 +42,20 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getAuthor());
+            $author = $this->getAuthor();
+            $author->generateAccessToken();
+
+            $this->_token = $author->access_token;
+
+            return $author->save();
         }
         
         return false;
+    }
+
+    public function getAccessToken()
+    {
+        return $this->_token;
     }
 
     protected function getAuthor(): ?Author

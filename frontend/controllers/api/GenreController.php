@@ -8,13 +8,9 @@ class GenreController extends ActiveController
 {
     public $modelClass = 'common\models\Genre';
 
-    public function actions()
-    {
-        $actions = parent::actions();
-
-        unset($actions['create'], $actions['update'], $actions['delete']);
-
-        return $actions;
-    }
+    public $serializer = [
+        'class' => 'yii\rest\Serializer',
+        'collectionEnvelope' => 'items',
+    ];
 
 }

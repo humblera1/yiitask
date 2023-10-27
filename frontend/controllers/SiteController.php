@@ -15,6 +15,7 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\web\Response;
 
 /**
  * Site controller
@@ -255,5 +256,14 @@ class SiteController extends Controller
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function actionApiError()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return [
+            'message' => 'Page Not Found',
+        ];
     }
 }

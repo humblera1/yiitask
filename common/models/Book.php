@@ -51,6 +51,7 @@ class Book extends \yii\db\ActiveRecord
             [['author_id', 'created_at', 'updated_at'], 'integer'],
             [['title', 'type'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Author::class, 'targetAttribute' => ['author_id' => 'id']],
+//            [['type'], 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This email address has already been taken.'],
             [['genreList'], 'safe'],
         ];
     }
@@ -67,6 +68,15 @@ class Book extends \yii\db\ActiveRecord
             'author_id' => 'Author',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+        ];
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'title',
+            'genres'
         ];
     }
 

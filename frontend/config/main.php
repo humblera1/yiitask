@@ -1,4 +1,7 @@
 <?php
+
+use yii\web\Response;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -13,16 +16,20 @@ return [
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
-            'csrfParam' => '_csrf-frontend',
+            'csrfParam' => '_csrf-api',
+            'parsers' => [
+                'application\json' => 'yii\web\JsonParser',
+            ],
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\models\Author',
             'enableAutoLogin' => true,
+            'enableSession' => false,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
-            'name' => 'advanced-frontend',
+            'name' => 'api-session',
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -34,16 +41,33 @@ return [
             ],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'site/api-error',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                'site/index' => 'site/index',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/author',
+                    'extraPatterns' => [
+                        'POST logout' => 'logout',
+                    ],
+
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/book',
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/genre',
+                    'only' => ['index', 'view'],
+                ],
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

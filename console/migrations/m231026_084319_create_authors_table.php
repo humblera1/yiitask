@@ -17,6 +17,7 @@ class m231026_084319_create_authors_table extends Migration
             'username' => $this->string(255)->notNull(),
             'email' => $this->string(255)->notNull(),
             'password_hash' => $this->string(255)->notNull(),
+            'access_token' => $this->string(255),
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
         ]);

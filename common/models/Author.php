@@ -3,6 +3,10 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\Url;
+use yii\web\IdentityInterface;
+use yii\web\Link;
+use yii\web\Linkable;
 
 /**
  * This is the model class for table "authors".
@@ -11,14 +15,15 @@ use Yii;
  * @property string $username
  * @property string $email
  * @property string $password_hash
+ * @property string $access_token
  * @property int|null $created_at
  * @property int|null $updated_at
  *
  * @property int|null $bookAmount
  *
- * @property Books[] $books
+ * @property Book[] $books
  */
-class Author extends \yii\db\ActiveRecord
+class Author extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -40,6 +45,18 @@ class Author extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return [
+            'id',
+            'username',
+            'email',
+            'book amount' => function() {
+                return $this->getBooks()->count();
+            },
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,6 +71,52 @@ class Author extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
         ];
     }
+
+    public static function findIdentity($id)
+    {
+        //
+    }
+
+    public function getId()
+    {
+        //
+    }
+
+    public function getAuthKey()
+    {
+        //
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        //
+    }
+
+    public static function findByAuthorname($username)
+    {
+        return static::findOne(['username' => $username]);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['access_token' => $token]);
+    }
+
+    public function generateAccessToken()
+    {
+        $this->access_token = Yii::$app->security->generateRandomString(32);
+    }
+
+    public function setPassword($password)
+    {
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
+    }
+
 
     /**
      * Gets query for [[Books]].

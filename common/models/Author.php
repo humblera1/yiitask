@@ -4,11 +4,9 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\helpers\Url;
 use yii\web\IdentityInterface;
-use yii\web\Link;
-use yii\web\Linkable;
 
 /**
  * This is the model class for table "authors".
@@ -27,15 +25,12 @@ use yii\web\Linkable;
  */
 class Author extends ActiveRecord implements IdentityInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'authors';
+        return '{{%authors}}';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'timestampBehavior' => [
@@ -44,10 +39,7 @@ class Author extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['username', 'email', 'password_hash'], 'required'],
@@ -56,7 +48,7 @@ class Author extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    public function fields()
+    public function fields(): array
     {
         return [
             'id',
@@ -68,10 +60,7 @@ class Author extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -103,53 +92,58 @@ class Author extends ActiveRecord implements IdentityInterface
         //
     }
 
-    public static function findByAuthorname($username)
+    public static function findByAuthorname(string $authorname): static
     {
-        return static::findOne(['username' => $username]);
+        return static::findOne(['username' => $authorname]);
     }
 
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function findIdentityByAccessToken(mixed $token, mixed $type = null): static
     {
         return static::findOne(['access_token' => $token]);
     }
 
-    public function generateAccessToken()
+    public function generateAccessToken(): void
     {
         $this->access_token = Yii::$app->security->generateRandomString(32);
     }
 
-    public function setPassword($password)
+    public function setPassword($password): void
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
-    public function validatePassword($password)
+    public function validatePassword($password): bool
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
-
-    /**
-     * Gets query for [[Books]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\BooksQuery
-     */
-    public function getBooks()
+    public function getBooks(): ActiveQuery
     {
         return $this->hasMany(Book::class, ['author_id' => 'id']);
     }
 
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\AuthorQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\AuthorQuery(get_called_class());
-    }
-
-    public function getBookAmount()
+    public function getBookAmount(): ?int
     {
         return $this->getBooks()->count();
+    }
+
+    public function afterSave($insert, $changedAttributes): void
+    {
+        if ($insert) {
+            $message = "Новый автор зарегистрировался в системе!";
+        } else {
+            $message = "Автор с ID {$this->id} обновил учётную запись!";
+        }
+
+        Yii::info($message, 'author');
+
+        parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function afterDelete(): void
+    {
+        Yii::info("Автор с ID $this->id удалил учётную запись", 'author');
+
+        parent::afterDelete();
     }
 }

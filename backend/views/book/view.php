@@ -27,23 +27,23 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <div class="col-md-6">
+        <?= DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'id',
+                'title',
+                [
+                    'attribute' => 'type',
+                    'value' => BookTypeEnum::TYPE_LIST[$model->type],
+                ],
+                'genresLinks:raw',
+                [
+                    'attribute' => 'author_id',
+                    'value' => $model->author->username,
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'title',
-            [
-                'attribute' => 'type',
-                'value' => BookTypeEnum::TYPE_LIST[$model->type],
+                ],
             ],
-            'genresLinks:raw',
-            [
-                'attribute' => 'author_id',
-                'value' => $model->author->username,
-
-            ],
-        ],
-    ]) ?>
-
+        ]) ?>
+    </div>
 </div>

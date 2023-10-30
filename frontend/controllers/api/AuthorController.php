@@ -89,7 +89,6 @@ class AuthorController extends ActiveController
 
         if ($model->login()) {
             return [
-                'isSuccess' => 201,
                 'message' => 'Welcome back!',
                 'data' => $model,
                 'your token' => $model->getAccessToken()

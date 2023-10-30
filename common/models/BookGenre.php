@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "books_genres".
@@ -13,20 +15,17 @@ use Yii;
  * @property Book $books
  * @property Genre $genres
  */
-class BookGenre extends \yii\db\ActiveRecord
+class BookGenre extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'books_genres';
+        return '{{%books_genres}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['books_id', 'genres_id'], 'required'],
@@ -37,10 +36,7 @@ class BookGenre extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'books_id' => 'Books ID',
@@ -48,32 +44,13 @@ class BookGenre extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * Gets query for [[Books]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\BooksQuery
-     */
-    public function getBooks()
+    public function getBooks(): ActiveQuery
     {
         return $this->hasOne(Book::class, ['id' => 'books_id']);
     }
 
-    /**
-     * Gets query for [[Genres]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\GenresQuery
-     */
-    public function getGenres()
+    public function getGenres(): ActiveQuery
     {
         return $this->hasOne(Genre::class, ['id' => 'genres_id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\BookGenreQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\BookGenreQuery(get_called_class());
     }
 }

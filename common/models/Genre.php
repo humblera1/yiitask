@@ -2,11 +2,8 @@
 
 namespace common\models;
 
-use Yii;
-use yii\data\ActiveDataProvider;
-use yii\data\ArrayDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\web\Linkable;
 
 /**
  * This is the model class for table "genres".
@@ -15,22 +12,16 @@ use yii\web\Linkable;
  * @property string $name
  *
  * @property Book[] $books
- * @property BooksGenres[] $booksGenres
+ * @property BookGenre[] $booksGenres
  */
 class Genre extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'genres';
+        return '{{%genres}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
@@ -38,10 +29,7 @@ class Genre extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -49,15 +37,8 @@ class Genre extends ActiveRecord
         ];
     }
 
-    public function fields()
+    public function fields(): array
     {
-        $books = new ArrayDataProvider([
-            'allModels' => $this->books,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
-        ]);
-
         return [
             'id',
             'name',
@@ -65,32 +46,13 @@ class Genre extends ActiveRecord
         ];
     }
 
-    /**
-     * Gets query for [[Books]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\BookQuery
-     */
-    public function getBooks()
+    public function getBooks(): ActiveQuery
     {
         return $this->hasMany(Book::class, ['id' => 'books_id'])->viaTable('books_genres', ['genres_id' => 'id']);
     }
 
-    /**
-     * Gets query for [[BooksGenres]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\BooksGenresQuery
-     */
-    public function getBooksGenres()
+    public function getBookGenre(): ActiveQuery
     {
-        return $this->hasMany(BooksGenres::class, ['genres_id' => 'id']);
-    }
-
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\GenreQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\GenreQuery(get_called_class());
+        return $this->hasMany(BookGenre::class, ['genres_id' => 'id']);
     }
 }

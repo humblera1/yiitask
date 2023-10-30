@@ -56,8 +56,9 @@ class BookController extends ActiveController
         $book->author_id = Yii::$app->user->identity->id;
 
         if ($book->save()) {
+            Yii::$app->response->statusCode = 201;
             return [
-                'isSuccess' => 201,
+                'isSuccess' => true,
                 'message' => 'You have been successfully created a new book',
                 'book' => $book,
             ];
@@ -89,5 +90,7 @@ class BookController extends ActiveController
             'errors' => $book->getErrors(),
         ];
     }
+
+
 
 }

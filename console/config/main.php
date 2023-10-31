@@ -23,14 +23,16 @@ return [
           ],
     ],
     'components' => [
-        'log' => [
-            'targets' => [
-                [
-                    'class' => \yii\log\FileTarget::class,
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
+//        'log' => [
+//            'traceLevel' => 0,
+//            'targets' => [
+//                [
+//                    'class' => 'yii\log\DbTarget',
+//                    'levels' => ['debug'],
+//                    'categories' => ['book', 'author', 'genre']
+//                ],
+//            ],
+//        ],
     ],
     'params' => $params,
 ];

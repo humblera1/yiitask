@@ -5,6 +5,8 @@ namespace common\models;
 use common\models\enums\BookTypeEnum;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii2tech\ar\linkmany\LinkManyBehavior;
 
@@ -20,23 +22,21 @@ use yii2tech\ar\linkmany\LinkManyBehavior;
  *
  * @property string $genre
  *
- * @property Authors $author
- * @property BooksGenres[] $booksGenres
- * @property Genres[] $genres
+ * @property Author $author
+ * @property BookGenre[] $bookGenre
+ * @property Genre[] $genres
  */
-class Book extends \yii\db\ActiveRecord
+class Book extends ActiveRecord
 {
 
     public $genre;
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
+
+    public static function tableName(): string
     {
-        return 'books';
+        return '{{%books}}';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'categoriesBehavior' => [
@@ -50,10 +50,7 @@ class Book extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['title', 'author_id'], 'required'],
@@ -77,10 +74,7 @@ class Book extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -92,7 +86,7 @@ class Book extends \yii\db\ActiveRecord
         ];
     }
 
-    public function fields()
+    public function fields(): array
     {
         return [
             'id',
@@ -109,46 +103,22 @@ class Book extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * Gets query for [[Author]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\AuthorsQuery
-     */
-    public function getAuthor()
+    public function getAuthor(): ActiveQuery
     {
         return $this->hasOne(Author::class, ['id' => 'author_id']);
     }
 
-    /**
-     * Gets query for [[BooksGenres]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\BooksGenresQuery
-     */
-    public function getBookGenre()
+    public function getBookGenre(): ActiveQuery
     {
         return $this->hasMany(BookGenre::class, ['books_id' => 'id']);
     }
 
-    /**
-     * Gets query for [[Genres]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\GenresQuery
-     */
-    public function getGenres()
+    public function getGenres(): ActiveQuery
     {
         return $this->hasMany(Genre::class, ['id' => 'genres_id'])->via('bookGenre');
     }
 
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\BookQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\BookQuery(get_called_class());
-    }
-
-    public function getGenresLinks()
+    public function getGenresLinks(): string
     {
         $links = [];
 
@@ -160,7 +130,26 @@ class Book extends \yii\db\ActiveRecord
 
     }
 
-    public function afterSave($insert, $changedAttributes)
+    public function beforeSave($insert): bool
+    {
+        if (isset($this->genre)) {
+            $genre = Genre::findOne(['name' => $this->genre]);
+            $genreId = $genre->id;
+
+            if (!empty($bookGenre = BookGenre::findOne(['books_id' => $this->id, 'genres_id' => $genreId]))) {
+                $bookGenre->delete();
+            } else {
+                $bookGenre = new BookGenre();
+                $bookGenre->genres_id = $genreId;
+                $bookGenre->books_id = $this->id;
+
+                $bookGenre->save();
+            }
+        }
+        return parent::beforeSave($insert);
+    }
+
+    public function afterSave($insert, $changedAttributes): void
     {
         if (isset($this->genre)) {
             $genre = Genre::findOne(['name' => $this->genre]);
@@ -177,6 +166,26 @@ class Book extends \yii\db\ActiveRecord
                 $bookGenre->save();
             }
         }
+        $author = Yii::$app->user->identity->id;
+
+        if ($insert) {
+            $message = "Автором с ID {$author} создана книга '{$this->title}'";
+        } else {
+            $book = $changedAttributes['title'] ?? $this->title;
+            $message = "Автором с ID {$author} oбновлена книга '{$book}'";
+        }
+
+        Yii::info($message, 'book');
+
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function afterDelete(): void
+    {
+        $author = Yii::$app->user->identity->id;
+
+        Yii::info("Автором с ID {$author} удалена книга '{$this->title}'", 'book');
+
+        parent::afterDelete();
     }
 }

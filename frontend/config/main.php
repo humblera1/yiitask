@@ -32,11 +32,12 @@ return [
             'name' => 'api-session',
         ],
         'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
+//            'traceLevel' => 0,
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
-                    'levels' => ['error', 'warning'],
+                    'class' => 'yii\log\DbTarget',
+                    'levels' => ['info'],
+                    'categories' => ['book', 'author', 'genre'],
                 ],
             ],
         ],

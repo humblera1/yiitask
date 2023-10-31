@@ -19,7 +19,7 @@ class AuthorController extends ActiveController
         'collectionEnvelope' => 'items',
     ];
 
-    public function actions()
+    public function actions(): array
     {
         $actions = parent::actions();
 
@@ -28,7 +28,7 @@ class AuthorController extends ActiveController
         return $actions;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         $behaviors['authenticator']['only'] = ['update', 'delete', 'logout', 'me'];
@@ -46,7 +46,7 @@ class AuthorController extends ActiveController
         }
     }
 
-    public function actionCreate()
+    public function actionCreate(): array
     {
         $model = new SignupForm();
 
@@ -54,7 +54,7 @@ class AuthorController extends ActiveController
 
         if ($model->signup()) {
             return [
-                'isSuccess' => 201,
+                'isSuccess' => true,
                 'message' => 'You have been successfully registered',
                 'data' => $model,
                 'your token' => $model->getAccessToken()
@@ -68,7 +68,7 @@ class AuthorController extends ActiveController
     }
 
 
-    public function actionLogout()
+    public function actionLogout(): array
     {
         $author = Author::findOne(Yii::$app->user->identity->id);
 
@@ -76,12 +76,12 @@ class AuthorController extends ActiveController
         $author->save();
 
         return [
-            'isSuccess' => 200,
+            'isSuccess' => true,
             'message' => 'You have been successfully logout. Your token is no longer valid',
         ];
     }
 
-    public function actionLogin()
+    public function actionLogin(): array
     {
         $model = new LoginForm();
 
@@ -89,7 +89,7 @@ class AuthorController extends ActiveController
 
         if ($model->login()) {
             return [
-                'isSuccess' => 201,
+                'isSuccess' => true,
                 'message' => 'Welcome back!',
                 'data' => $model,
                 'your token' => $model->getAccessToken()
@@ -102,7 +102,7 @@ class AuthorController extends ActiveController
         ];
     }
 
-    public function actionMe()
+    public function actionMe(): Author
     {
         return Yii::$app->user->identity;
     }

@@ -3,44 +3,36 @@
 namespace frontend\models;
 
 use common\models\Author;
-use Yii;
 use yii\base\Model;
 
-/**
- * Signup form
- */
 class SignupForm extends Model
 {
-    public $username;
-    public $email;
-    public $password;
+    public ?string $username = null;
+    public ?string $email = null;
+    public ?string $password = null;
 
-    protected $_token;
+    protected ?string $_token = null;
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
-            ['username', 'trim'],
-            ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This username has already been taken.'],
-            ['username', 'string', 'min' => 2, 'max' => 255],
+            [['username'], 'trim'],
+            [['username'], 'required'],
+            [['username'], 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This username has already been taken.'],
+            [['username'], 'string', 'min' => 2, 'max' => 255],
 
-            ['email', 'trim'],
-            ['email', 'required'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This email address has already been taken.'],
+            [['email'], 'trim'],
+            [['email'], 'required'],
+            [['email'], 'email'],
+            [['email'], 'string', 'max' => 255],
+            [['email'], 'unique', 'targetClass' => '\common\models\Author', 'message' => 'This email address has already been taken.'],
 
-            ['password', 'required'],
-            ['password', 'string'],
+            [['password'], 'required'],
+            [['password'], 'string'],
         ];
     }
 
-    public function signup()
+    public function signup(): ?bool
     {
         if (!$this->validate()) {
             return null;
@@ -58,7 +50,7 @@ class SignupForm extends Model
         return $author->save();
     }
 
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         return $this->_token;
     }

@@ -3,25 +3,18 @@
 namespace frontend\models;
 
 use common\models\Author;
-use Yii;
 use yii\base\Model;
 
-/**
- * Login form
- */
 class LoginForm extends Model
 {
-    public $username;
-    public $password;
+    public ?string $username = null;
+    public ?string $password = null;
 
-    private $_author;
-    private $_token;
+    private ?Author $_author = null;
+    private ?string $_token = null;
 
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['username', 'password'], 'required'],
@@ -29,7 +22,7 @@ class LoginForm extends Model
         ];
     }
 
-    public function validatePassword($attribute, $params)
+    public function validatePassword($attribute, $params): void
     {
         if (!$this->hasErrors()) {
             $author = $this->getAuthor();
@@ -39,7 +32,7 @@ class LoginForm extends Model
         }
     }
 
-    public function login()
+    public function login(): bool
     {
         if ($this->validate()) {
             $author = $this->getAuthor();
@@ -53,7 +46,7 @@ class LoginForm extends Model
         return false;
     }
 
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         return $this->_token;
     }

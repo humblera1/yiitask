@@ -3,10 +3,8 @@
 namespace frontend\controllers\api;
 
 use common\models\Book;
-use common\models\Genre;
 use Yii;
 use yii\filters\auth\HttpBearerAuth;
-use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
 use yii\web\ForbiddenHttpException;
 
@@ -19,7 +17,7 @@ class BookController extends ActiveController
         'collectionEnvelope' => 'items',
     ];
 
-    public function actions()
+    public function actions(): array
     {
         $actions = parent::actions();
 
@@ -28,7 +26,7 @@ class BookController extends ActiveController
         return $actions;
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         $behaviors['authenticator']['only'] = ['create', 'update', 'delete'];
@@ -46,7 +44,7 @@ class BookController extends ActiveController
         }
     }
 
-    public function actionCreate()
+    public function actionCreate(): array
     {
         $book = new Book();
 
@@ -56,8 +54,9 @@ class BookController extends ActiveController
         $book->author_id = Yii::$app->user->identity->id;
 
         if ($book->save()) {
+            Yii::$app->response->statusCode = 201;
             return [
-                'isSuccess' => 201,
+                'isSuccess' => true,
                 'message' => 'You have been successfully created a new book',
                 'book' => $book,
             ];
@@ -69,7 +68,7 @@ class BookController extends ActiveController
         ];
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate(int $id): array
     {
         $book = Book::findOne($id);
 
@@ -78,7 +77,7 @@ class BookController extends ActiveController
 
         if ($book->save()) {
             return [
-                'isSuccess' => 200,
+                'isSuccess' => true,
                 'message' => 'You have been successfully updated the book',
                 'book' => $book,
             ];

@@ -160,7 +160,7 @@ class Book extends \yii\db\ActiveRecord
 
     }
 
-    public function beforeSave($insert)
+    public function afterSave($insert, $changedAttributes)
     {
         if (isset($this->genre)) {
             $genre = Genre::findOne(['name' => $this->genre]);
@@ -169,6 +169,7 @@ class Book extends \yii\db\ActiveRecord
             if (!empty($bookGenre = BookGenre::findOne(['books_id' => $this->id, 'genres_id' => $genreId]))) {
                 $bookGenre->delete();
             } else {
+
                 $bookGenre = new BookGenre();
                 $bookGenre->genres_id = $genreId;
                 $bookGenre->books_id = $this->id;
@@ -176,6 +177,6 @@ class Book extends \yii\db\ActiveRecord
                 $bookGenre->save();
             }
         }
-        return parent::beforeSave($insert);
+        parent::afterSave($insert, $changedAttributes);
     }
 }

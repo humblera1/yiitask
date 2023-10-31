@@ -54,7 +54,6 @@ return [
                     'controller' => 'api/author',
                     'extraPatterns' => [
                         'GET me' => 'me',
-                        'POST register' => 'create',
                         'POST login' => 'login',
                         'POST logout' => 'logout',
                     ],

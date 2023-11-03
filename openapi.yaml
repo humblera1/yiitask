@@ -1,0 +1,718 @@
+openapi: 3.0.0
+info: 
+  version: 1.0.0
+  title: testtask REST API
+servers:
+  - description: ""
+    url: http://localhost:8080/api
+paths:
+  /books:
+    get:
+      summary: Request to show all books
+      tags: 
+        - books
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: A page number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      example: {
+                        id: 1,
+                        title: My Humble Life,
+                        author: humblerat,
+                        type: print,
+                        genres: magical realism
+                      }
+                  _links:
+                    type: object
+                    description: A JSON object containing links to the current, first and last pages
+                  _meta:
+                    type: object
+                    description: A JSON object containing information about total number of books
+        500:
+          $ref: "#/components/responses/FatalError"
+    post:
+      security:
+        - bearerAuth: []
+      summary: Create a new book
+      tags:
+        - books
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: 
+                title:
+                  type: string
+                  description: Title of the book to be created
+                type:
+                  type: string
+                  description: Type of book edition
+                  enum:
+                    - print
+                    - digit
+                    - graphic
+                genre:
+                  type: string
+                  description: The book genre
+              required:
+              - title
+      responses:
+        200:
+          description: Error in passed parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasErrors:
+                    type: boolean
+                  errors:
+                    type: object
+                    description: A JSON object containing validation errors for each parameter
+                    example:
+                      title: [
+                        "Title cannot be blank."]
+        201:
+          description: A new book has been successfully created
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                  message:
+                    type: string
+                    example: A new book has been successfully created
+                  book:
+                    type: object
+                    description: Information about the newly created book
+                    properties:
+                      id: 
+                        type: integer
+                        example: 1
+                      title:
+                        type: string
+                        example: My Humble Life
+                      author:
+                        type: string
+                        example: humblerat
+                      type:
+                        type: string
+                        nullable: true
+                      genres:
+                        type: array
+                        items:
+                          type: string
+                          example: magical realism
+                        nullable: true
+        401:
+          description: Your request was made with invalid credentials
+        500:
+          $ref: "#/components/responses/FatalError"
+  /books/{id}:
+    get:
+      summary: Get book information by ID
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: integer
+          description: Book ID
+          required: true
+      tags:
+        - books
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: My Humble Life
+                  author:
+                    type: string
+                    example: humblerat
+                  type:
+                    type: string
+                    nullable: true
+                  genres:
+                    type: string
+                    example: magical realism
+                    nullable: true
+        404:
+          description: Book not found
+        500:
+          $ref: "#/components/responses/FatalError"  
+    put:
+      security:
+        - bearerAuth: []
+      summary: Update your book information by ID
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: integer
+          description: Book ID
+          required: true
+      tags:
+        - books
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: 
+                title:
+                  type: string
+                  description: Title of the book to be updated
+                type:
+                  type: string
+                  description: Type of book edition
+                  enum:
+                    - print
+                    - digit
+                    - graphic
+                genre:
+                  type: string
+                  description: The book genre
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: My Humble Life
+                  author:
+                    type: string
+                    example: humblerat
+                  type:
+                    type: string
+                    nullable: true
+                  genres:
+                    type: string
+                    example: magical realism
+                    nullable: true
+        401:
+          description: Your request was made with invalid credentials
+        500:
+          $ref: "#/components/responses/FatalError"
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Update your book information by ID
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: integer
+          description: Book ID
+          required: true
+      tags:
+        - books
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: 
+                title:
+                  type: string
+                  description: Title of the book to be updated
+                type:
+                  type: string
+                  description: Type of book edition
+                  enum:
+                    - print
+                    - digit
+                    - graphic
+                genre:
+                  type: string
+                  description: The book genre
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: My Humble Life
+                  author:
+                    type: string
+                    example: humblerat
+                  type:
+                    type: string
+                    nullable: true
+                  genres:
+                    type: string
+                    example: magical realism
+                    nullable: true
+        401:
+          description: Your request was made with invalid credentials
+        500:
+          $ref: "#/components/responses/FatalError"
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete book by ID
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: integer
+          description: Book ID
+          required: true
+      tags:
+        - books
+      responses:
+        204:
+          description: Book has been successfully deleted
+        401:
+          description: Your request was made with invalid credentials
+        500:
+          $ref: "#/components/responses/FatalError"
+  /authors:
+    get:
+      summary: Request to show all authors
+      tags: 
+        - authors
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: A page number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      example: {
+                        id: 1,
+                        username: humblerat,
+                        email: humblerat@mail.ru,
+                        book amount: 1,
+                      }
+                  _links:
+                    type: object
+                    description: A JSON object containing links to the current, first and last pages
+                  _meta:
+                    type: object
+                    description: A JSON object containing information about total number of authors
+        500:
+          $ref: "#/components/responses/FatalError"
+    post:
+      summary: Registration Request
+      tags: 
+        - authors
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: 
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - email
+                - password
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSuccess:
+                    type: boolean
+                  message: 
+                    type: string
+                    example: You have been successfully registered
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      example: {
+                        username: humblerat,
+                        email: humblerat@mail.ru,
+                        password: 481516,
+                      }
+                  your token:
+                    type: string
+                    example: K2EP5l0RG5YB1Vf39pKIYCHml1V3****
+        500:
+          $ref: "#/components/responses/FatalError"
+    
+  /authors/{id}:
+      get:
+        summary: Get author information by ID
+        parameters:
+          - in: path
+            name: id
+            schema: 
+              type: integer
+            description: Author ID
+            required: true
+        tags:
+          - authors
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id: 
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: humblerat
+                    email:
+                      type: string
+                      example: humblerat@mail.ru
+                    book amount:
+                      type: integer
+          404:
+            description: Author not found
+          500:
+            $ref: "#/components/responses/FatalError"  
+      put:
+        summary: Update your information
+        parameters:
+          - in: path
+            name: id
+            schema: 
+              type: integer
+            description: Author ID
+            required: true
+        tags:
+          - authors
+        requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties: 
+                  username:
+                    type: string
+                    description: The name you used when registering
+                  email:
+                    type: string
+                    description: Your email address
+                  password: 
+                    type: string
+                    description: Your password
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id: 
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: humblerat
+                    email:
+                      type: string
+                      example: humblerat@mail.ru
+                    book amount:
+                      type: integer
+          401:
+            description: Your request was made with invalid credentials
+          500:
+            $ref: "#/components/responses/FatalError"
+      patch:
+        summary: Update your information
+        parameters:
+          - in: path
+            name: id
+            schema: 
+              type: integer
+            description: Author ID
+            required: true
+        tags:
+          - authors
+        requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties: 
+                  username:
+                    type: string
+                    description: The name you used when registering
+                  email:
+                    type: string
+                    description: Your email address
+                  password: 
+                    type: string
+                    description: Your password
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id: 
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: humblerat
+                    email:
+                      type: string
+                      example: humblerat@mail.ru
+                    book amount:
+                      type: integer
+          401:
+            description: Your request was made with invalid credentials
+          500:
+            $ref: "#/components/responses/FatalError"
+      delete:
+        summary: Delete your account and all your books
+        parameters:
+          - in: path
+            name: id
+            schema: 
+              type: integer
+            description: Author ID
+            required: true
+        tags:
+          - authors
+        responses:
+          204:
+            description: Your account has been successfully deleted
+          401:
+            description: Your request was made with invalid credentials
+          500:
+            $ref: "#/components/responses/FatalError"
+  /authors/login:
+      post:
+        summary: Login and token renewal
+        tags:
+          - authors
+        requestBody:
+            content:
+              multipart/form-data:
+                schema:
+                  type: object
+                  properties: 
+                    username:
+                      type: string
+                      description: The name you used when registering
+                    password: 
+                      type: string
+                      description: Your password
+                  required:
+                  - username
+                  - password
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                    message: 
+                      type: string
+                      example: Welcome back!
+                    data:
+                      type: object
+                      example:
+                        username: "humblerat"
+                        password: "481516"
+                    your token:
+                      type: string
+                      example: K2EP5l0RG5YB1Vf39pKIYCHml1V3****
+          500:
+            $ref: "#/components/responses/FatalError"  
+      
+  /authors/logout:
+    post:
+      summary: Logout and deleting a token
+      tags:
+        - authors
+      responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    isSuccess:
+                      type: boolean
+                    message:
+                      type: string
+                      example: You have been successfully logout. Your token is no longer valid
+          401:
+            description: Your request was made with invalid credentials
+          500:
+            $ref: "#/components/responses/FatalError"
+  /authors/me:
+    get:
+      summary: Get your identity
+      tags:
+        - authors
+      responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id: 
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: humblerat
+                    email:
+                      type: string
+                      example: humblerat@mail.ru
+                    book amount:
+                      type: integer
+          401:
+            description: Your request was made with invalid credentials
+          500:
+            $ref: "#/components/responses/FatalError"
+  /genres:
+    get:
+      summary: Request to show all genres
+      tags:
+        - genres
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: A page number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  items:
+                    type: object
+                    description: List of available genres
+                    example:
+                      id: 1
+                      name: fantasy
+                      books: [...]
+                  _links:
+                    type: object
+                    description: A JSON object containing links to the current, first and last pages
+                  _meta:
+                    type: object
+                    description: A JSON object containing information about total number of genres
+        500:
+          $ref: "#/components/responses/FatalError"
+  /genres/{id}:
+    get:
+      summary: Get genre information by ID
+      tags:
+        - genres 
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A genre ID
+          required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: fantasy
+                  books:
+                    type: array
+                    items: 
+                      type: object
+                      description: List of books
+        404:
+          description: Genre not found
+        500:
+          $ref: "#/components/responses/FatalError"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    FatalError:
+      description: Critical error on the server

@@ -10,8 +10,8 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
-    public ?string $username = null;
-    public ?string $password = null;
+    public ?string $username = '';
+    public ?string $password = '';
     public ?bool $rememberMe = true;
 
     private ?Admin $_admin = null;
@@ -29,7 +29,7 @@ class LoginForm extends Model
         ];
     }
 
-    public function validatePassword(string $attribute, array $params): void
+    public function validatePassword(string $attribute, ?array $params): void
     {
         if (!$this->hasErrors()) {
             $user = $this->getAdmin();
